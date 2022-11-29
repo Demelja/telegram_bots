@@ -1,0 +1,105 @@
+// PXCodeBot
+
+var token = '5968580273:AAGUpJkgiw8FBkhXcMG4oLNdwG3rW8facWg';
+var telegramUrl = 'https://api.telegram.org/bot'+ token;
+var webAppUrl = 'https://script.google.com/macros/s/AKfycbxHzlHebgnxrUsreHQRaD_smkjTh6mn3jYAhLSF8Eo4HyqKZiUzsVHOnPUPp0Wdqsi4/exec';
+
+var spreadsheetId = '1l_I30SkhLIlaey_FKeVSPm6CWMzIWg0WGuqIcTzG-ng';
+var sheetAlarms = 'Codes';
+var dataField = SpreadsheetApp.openById(spreadsheetId).getSheetByName(sheetAlarms);
+var sheetVisitors = 'Visitors';
+var logField = SpreadsheetApp.openById(spreadsheetId).getSheetByName(sheetVisitors);
+
+var textNoText = "<b>Nieprawidłowy kod</b>. Proszę podać jedną lub dwie <u>cyfry</u> pomiędzy 1 a 30.";
+var textNoResult = "Taki kod nie używany. Spróbuj jeszcze raz.";
+ 
+
+function doPost(e) {
+  // исполняется когда создается пост в Телеграме
+  var contents = JSON.parse(e.postData.contents);
+  // message.from.is_bot message.from.first_name message.from.language_code
+  // chat.id chat.first_name chat.type
+  // date
+  var from_isbot = contents.message.from.is_bot;
+  var from_name = contents.message.from.first_name;
+  var from_language = contents.message.from.language_code;
+  var date = contents.message.date;
+  var chat_id = contents.message.chat.id;
+  var text = contents.message.text;
+  // записать в протокол вопрошающего и его запрос
+  logField.appendRow([chat_id, text, date, from_name, from_language, from_isbot]);
+  // 
+  seekAlarm(chat_id, text)
+  //////sendText(chat_id, seekAlarm(text));
+  //SpreadsheetApp.getActive().getActiveSheet().getRange(2, 10).setValue(JSON.stringify(contents, null, 5));
+  //SpreadsheetApp.openById(spreadsheetId).getSheetByName(sheetName).appendRow([chat_id, text]);
+  //dataField.appendRow([chat_id, text]);
+
+}
+
+function sendText(chat_id, text) {
+  var data = {
+    method: "post",
+    payload: {
+      method: "sendMessage",
+      chat_id: String(chat_id),
+      text: text,
+      parse_mode: "HTML"
+    }
+  };
+  UrlFetchApp.fetch(telegramUrl + '/', data);
+}
+
+
+function seekAlarm(chat_id, text) {
+  // 
+  if ((Number.parseInt(text) > 0) && (Number.parseInt(text) < 31)) {
+    var searchField = dataField.getRange(1,1,59,1);
+    var textSearchDot = text + ".";
+    var searchGoalsDot = searchField.createTextFinder(textSearchDot).findAll();
+    for (let searchGoal of searchGoalsDot) {
+      sendText(chat_id, "<b>" + searchGoal.getValue() + "</b> ::: " + searchGoal.offset(0,1).getValue());
+    }
+    var textSearchParentheses = "(" + text + ")";
+    var searchGoalsParentheses = searchField.createTextFinder(textSearchParentheses).findAll();
+    for (let searchGoal of searchGoalsParentheses) {
+      sendText(chat_id, "<b>" + searchGoal.getValue() + "</b> ::: " + searchGoal.offset(0,1).getValue());
+    }
+    if ((searchGoalsDot.length == 0) && (searchGoalsParentheses.length == 0)) {
+      sendText(chat_id, textNoResult);
+    }
+  } else {
+    sendText(chat_id, textNoText);
+  }
+  //
+
+}
+
+
+
+
+
+
+
+
+
+
+
+/*
+==============================================================================================================
+*/
+function getMe() {
+  var url = telegramUrl + '/getMe';
+  var responce = UrlFetchApp.fetch(url);
+  Logger.log(responce.getContentText());
+}
+
+function setWebhook() {
+  var url = telegramUrl + '/setWebhook?url=' + webAppUrl;
+  var responce = UrlFetchApp.fetch(url);
+  Logger.log(responce.getContentText());
+}
+
+function doGet(e) {
+  return HtmlService.createHtmlOutput("Привет! ыћ©ttttt!!!")
+}
