@@ -1,10 +1,10 @@
 // PXCodeBot
 
-var token = '5968580273:AAGUpJkgiw8FBkhXcMG4oLNdwG3rW8facWg';
+var token = '<There_is_my_token>';
 var telegramUrl = 'https://api.telegram.org/bot'+ token;
-var webAppUrl = 'https://script.google.com/macros/s/AKfycbxHzlHebgnxrUsreHQRaD_smkjTh6mn3jYAhLSF8Eo4HyqKZiUzsVHOnPUPp0Wdqsi4/exec';
+var webAppUrl = 'https://script.google.com/macros/s/<Shown_in_address_bar>/exec';
 
-var spreadsheetId = '1l_I30SkhLIlaey_FKeVSPm6CWMzIWg0WGuqIcTzG-ng';
+var spreadsheetId = '<Shown_in_address_bar>';
 var sheetAlarms = 'Codes';
 var dataField = SpreadsheetApp.openById(spreadsheetId).getSheetByName(sheetAlarms);
 var sheetVisitors = 'Visitors';
